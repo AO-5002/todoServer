@@ -37,6 +37,26 @@ public class TaskController {
         return ResponseEntity.ok(user);
     }
 
+    @PatchMapping("/{id}")
+    public ResponseEntity<?> updateTask(@PathVariable Long id, @RequestBody Map<String, Object> updates) {
+        var task = taskRepository.findById(id).orElse(null);
+        if (task == null) {
+            return ResponseEntity.notFound().build();
+        }
+
+        if (updates.containsKey("title")) {
+            task.setTitle((String) updates.get("title"));
+        }
+
+        if (updates.containsKey("completed")) {
+            task.setCompleted((Boolean) updates.get("completed"));
+        }
+
+        // Don't update id or createdAt
+        TaskEntity updatedTask = taskRepository.save(task);
+        return ResponseEntity.ok(updatedTask);
+    }
+
     @PostMapping
     public ResponseEntity<?> createTask(@RequestBody TaskEntity newTask) {
         try {
